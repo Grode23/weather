@@ -9,7 +9,7 @@ use crate::json_structs::Forecast;
 struct Opt {
 
 	/// Name of the city
-	#[structopt(short, long, parse(try_from_str), default_value = "Thessaloniki")]
+	#[structopt(short, long, parse(try_from_str), default_value = "MOSCOW")]
 	city: String,
 
 	/// State code of the location
@@ -23,10 +23,10 @@ struct Opt {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>>{
-    let opt = Opt::from_args();
-	let answer = Forecast::get(&opt.city).await?;
+    let _opt = Opt::from_args();
+	let answer = Forecast::get().await?;
 
-	println!("{:?}", answer.sys);
+	println!("{:?}", answer.Headline.Text);
 
 	Ok(())
 }

@@ -1,78 +1,70 @@
+#![allow(non_snake_case)]
 use serde::Deserialize;
 use reqwest::Url;
 
 #[derive(Deserialize, Debug)]
 pub struct Forecast {
-    coord: Coord,
-    weather: Vec<Weather>,
-    base: String,
-    main: MainInfo,
-    visibility: i32,
-    wind: Wind,
-    clouds: Clouds,
-    dt: i32,
-    pub sys: Sys,
-    id: i32,
-    name: String,
-    cod: i32,
+    pub Headline: Headline,
+    DailyForecasts: Vec<DailyForecast>,
 }
 
 #[derive(Deserialize, Debug)]
-struct Coord {
-    lon: f64,
-    lat: f64,
+pub struct Headline {
+    EffectiveDate: String,
+    EffectiveEpochDate: i32,
+    Severity: i32,
+    pub Text: String,
+    Category: String,
+    //EndDate: String,
+    //EndEpochDate: i32,
+    MobileLink: String,
+    Link: String,
 }
 
 #[derive(Deserialize, Debug)]
-struct Weather {
-    id: i32,
-    main: String,
-    description: String,
-    icon: String,
+struct DailyForecast {
+    Date: String,
+    EpochDate: i32,
+    Temperature: Temperature,
+    Day: DayNight,
+    Night: DayNight,
+    Sources: Vec<String>,
+    MobileLink: String,
+    Link: String,
 }
 
 #[derive(Deserialize, Debug)]
-struct MainInfo {
-    temp: f64,
-    pressure: i32,
-    humidity: i32,
-    temp_min: f64,
-    temp_max: f64,
-
+struct Temperature {
+    Minimum: MinMax,
+    Maximum: MinMax,
 }
 
 #[derive(Deserialize, Debug)]
-struct Wind {
-    speed: f64,
-    deg: i32,
+struct MinMax {
+    Value: f64,
+    Unit: String,
+    UnitType: i32,
 }
 
 #[derive(Deserialize, Debug)]
-struct Clouds {
-    all: i32,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct Sys {
-    r#type: i32,
-    id: i32,
-    country: String,
-    sunrise: u32,
-    sunset: u32,
+struct DayNight {
+    Icon: i32,
+    IconPhrase: String,
+    HasPrecipitation: bool,
 }
 
 impl Forecast {
 
-    pub async fn get(city: &str) -> Result<Self, Box<dyn std::error::Error>>{
+    pub async fn get() -> Result<Self, Box<dyn std::error::Error>>{
 
-        let url = format!("https://api.openweathermap.org/data/2.5/weather?q={}&appid={}", city, "a0ab7e38245efbba82cc3f2ec308fe2c");
+        let url = format!("http://dataservice.accuweather.com/forecasts/v1/daily/5day/{}?metric=true&apikey={}", 186405, "oDWbqGBn8dx63C0KyvvwCu0uma4GUWZS");
         let url = Url::parse(&*url)?;
 
-        let respone = reqwest::get(url)
+        let response = reqwest::get(url)
             .await?
             .json::<Forecast>()
             .await?;
 
-        Ok(respone)
+        Ok(response)
     }
 }
