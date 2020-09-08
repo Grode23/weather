@@ -26,7 +26,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
     let _opt = Opt::from_args();
 	let answer = Forecast::get().await?;
 
-	println!("{:?}", answer.Headline.Text);
+	let (mins, maxs) = answer.get_temperatures();
+
+	println!("Mins: {:?}", mins);
+	println!("Maxs: {:?}", maxs);
 
 	Ok(())
 }

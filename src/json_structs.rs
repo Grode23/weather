@@ -67,4 +67,18 @@ impl Forecast {
 
         Ok(response)
     }
+
+    pub fn get_temperatures(&self) -> (Vec<f64>, Vec<f64>){
+        let daily_forecasts = &self.DailyForecasts;
+
+        let mut mins: Vec<f64> = Vec::new();
+        let mut maxs: Vec<f64> = Vec::new();
+
+        for daily_forecast in daily_forecasts {
+            mins.push(daily_forecast.Temperature.Minimum.Value);
+            maxs.push(daily_forecast.Temperature.Maximum.Value);
+        }
+
+        (mins, maxs)
+    }
 }
