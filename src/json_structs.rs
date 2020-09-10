@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 use serde::Deserialize;
 use reqwest::Url;
+use crate::models::NewTemperature;
 
 #[derive(Deserialize, Debug)]
 pub struct Forecast {
@@ -41,7 +42,7 @@ struct Temperature {
 
 #[derive(Deserialize, Debug)]
 struct MinMax {
-    Value: f64,
+    Value: f32,
     Unit: String,
     UnitType: i32,
 }
@@ -57,7 +58,7 @@ impl Forecast {
 
     pub async fn get() -> Result<Self, Box<dyn std::error::Error>>{
 
-        let url = format!("http://dataservice.accuweather.com/forecasts/v1/daily/5day/{}?metric=true&apikey={}", 186405, "oDWbqGBn8dx63C0KyvvwCu0uma4GUWZS");
+        let url = format!("http://dataservice.accuweather.com/forecasts/v1/daily/5day/{}?metric=true&apikey={}", 186405, "fQZ3PdGlJiJDVVOfRmEGAFyjGcrUArtH");
         let url = Url::parse(&*url)?;
 
         let response = reqwest::get(url)
@@ -68,17 +69,24 @@ impl Forecast {
         Ok(response)
     }
 
-    pub fn get_temperatures(&self) -> (Vec<f64>, Vec<f64>){
+    pub fn get_temperatures(&self) -> Vec<NewTemperature>{
         let daily_forecasts = &self.DailyForecasts;
 
-        let mut mins: Vec<f64> = Vec::new();
-        let mut maxs: Vec<f64> = Vec::new();
+        let mut temperatures:Vec<NewTemperature> = Vec::new();
 
+        let current_date = String::from(&daily_forecasts[0].Date[0..10]);
         for daily_forecast in daily_forecasts {
-            mins.push(daily_forecast.Temperature.Minimum.Value);
-            maxs.push(daily_forecast.Temperature.Maximum.Value);
+
+            let temperature = NewTemperature {
+                minimum: daily_forecast.Temperature.Minimum.Value,
+                maximum: daily_forecast.Temperature.Maximum.Value,
+                date_of_temp: String::from(&daily_forecast.Date[0..10]),
+                date_today: current_date.clone(),
+            };
+
+            temperatures.push(temperature);
         }
 
-        (mins, maxs)
+        temperatures
     }
 }

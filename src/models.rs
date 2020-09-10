@@ -9,7 +9,7 @@ pub struct Temperature {
 
 use super::schema::temperatures;
 
-#[derive(Insertable)]
+#[derive(Insertable, Debug)]
 #[table_name="temperatures"]
 pub struct NewTemperature {
     pub minimum:  f32,

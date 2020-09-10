@@ -15,14 +15,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
 
 	let answer = Forecast::get().await?;
 
-	let (mins, maxs) = answer.get_temperatures();
+	let temperatures = answer.get_temperatures();
 
-	println!("Mins: {:?}", mins);
-	println!("Maxs: {:?}", maxs);
+	for temp in &temperatures {
+		println!("{:?}", temp);
+	}
 
 	let connection = establish_connection();
 
-	insert_temperature(&connection);
+	insert_temperature(&connection, temperatures);
 
 	Ok(())
 }
