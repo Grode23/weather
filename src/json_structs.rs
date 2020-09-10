@@ -5,33 +5,13 @@ use crate::models::NewTemperature;
 
 #[derive(Deserialize, Debug)]
 pub struct Forecast {
-    pub Headline: Headline,
     DailyForecasts: Vec<DailyForecast>,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct Headline {
-    EffectiveDate: String,
-    EffectiveEpochDate: i32,
-    Severity: i32,
-    pub Text: String,
-    Category: String,
-    //EndDate: String,
-    //EndEpochDate: i32,
-    MobileLink: String,
-    Link: String,
 }
 
 #[derive(Deserialize, Debug)]
 struct DailyForecast {
     Date: String,
-    EpochDate: i32,
     Temperature: Temperature,
-    Day: DayNight,
-    Night: DayNight,
-    Sources: Vec<String>,
-    MobileLink: String,
-    Link: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -45,13 +25,6 @@ struct MinMax {
     Value: f32,
     Unit: String,
     UnitType: i32,
-}
-
-#[derive(Deserialize, Debug)]
-struct DayNight {
-    Icon: i32,
-    IconPhrase: String,
-    HasPrecipitation: bool,
 }
 
 impl Forecast {
@@ -80,8 +53,8 @@ impl Forecast {
             let temperature = NewTemperature {
                 minimum: daily_forecast.Temperature.Minimum.Value,
                 maximum: daily_forecast.Temperature.Maximum.Value,
-                date_of_temp: String::from(&daily_forecast.Date[0..10]),
-                date_today: current_date.clone(),
+                date_of_forecast: String::from(&daily_forecast.Date[0..10]),
+                date_saved: current_date.clone(),
             };
 
             temperatures.push(temperature);
