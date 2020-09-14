@@ -3,7 +3,7 @@ table! {
         id -> Integer,
         minimum -> Float,
         maximum -> Float,
-        date_of_temp -> Varchar,
-        date_today -> Varchar,
+        date_of_forecast -> Varchar,
+        date_saved -> Varchar,
     }
 }

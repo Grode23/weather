@@ -11,21 +11,43 @@ pub fn establish_connection() -> MysqlConnection {
         .expect(&format!("Error connecting to {}", database_url))
 }
 
-use super::models::NewTemperature;
+use super::models::{Temperature, NewTemperature};
+// To access the table
+use crate::schema::temperatures::dsl::*;
+use crate::schema::temperatures::columns::{date_saved, date_of_forecast};
+use crate::models::*;
 
 pub fn insert_temperature(conn: &MysqlConnection, new_temperatures: Vec<NewTemperature>) {
+
     // Import the table
     use super::schema::temperatures;
 
-    // let new_temperature = NewTemperature {
-    //     minimum: 5.0,
-    //     maximum: 10.6,
-    //     date_of_temp: String::from("25"),
-    //     date_today: String::from("24"),
-    // };
+    // check if the current date is inserted again. if it is, don't insert it again and whoop an error
 
     diesel::insert_into(temperatures::table)
         .values(&new_temperatures)
         .execute(conn)
         .expect("Error saving new post");
+}
+
+pub fn show_from_date(connection: &MysqlConnection, date: String, type_of_date: Date){
+
+    let results: Vec<Temperature>;
+
+    match type_of_date {
+        Date::DateSaved => results = temperatures
+            .filter(date_saved.eq(date))
+            .load::<Temperature>(connection)
+            .expect("Error loading temperatures from saved date"),
+        Date::DateOfForecast => results = temperatures
+            .filter(date_of_forecast.eq(date))
+            .load::<Temperature>(connection)
+            .expect("Error loading temperatures from saved date"),
+    }
+
+
+    for result in results {
+        println!("{:?}", result);
+    }
+
 }

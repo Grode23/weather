@@ -9,21 +9,24 @@ mod models;
 
 use json_structs::Forecast;
 use database_stuff::*;
+use models::Date;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>>{
 
-	let answer = Forecast::get().await?;
-
-	let temperatures = answer.get_temperatures();
-
-	for temp in &temperatures {
-		println!("{:?}", temp);
-	}
-
 	let connection = establish_connection();
 
+	// Get data from JSON
+	let answer = Forecast::get().await?;
+
+	// The prediction for the upcoming 5 days
+	let temperatures = answer.get_temperatures();
+
 	insert_temperature(&connection, temperatures);
+
+	let date = Date::DateSaved;
+	show_from_date(&connection, String::from("2020-09-10"), date);
+
 
 	Ok(())
 }
