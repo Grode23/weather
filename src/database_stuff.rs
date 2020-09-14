@@ -22,12 +22,19 @@ pub fn insert_temperature(conn: &MysqlConnection, new_temperatures: Vec<NewTempe
     // Import the table
     use super::schema::temperatures;
 
-    // check if the current date is inserted again. if it is, don't insert it again and whoop an error
+    // Get date from an index that is going to be inserted
+    // Every index has the same date_saved, so it doesn't matter which one I get
+    let date = String::from(&new_temperatures.get(0).unwrap().date_saved);
 
-    diesel::insert_into(temperatures::table)
-        .values(&new_temperatures)
-        .execute(conn)
-        .expect("Error saving new post");
+    // check if the current date is inserted again. if it is, print it without inserting again
+    if no_data_for_date(conn, date) {
+        diesel::insert_into(temperatures::table)
+            .values(&new_temperatures)
+            .execute(conn)
+            .expect("Error saving new post");
+    } else {
+        println!("This date is already inserted");
+    }
 }
 
 pub fn show_from_date(connection: &MysqlConnection, date: String, type_of_date: Date){
@@ -42,12 +49,24 @@ pub fn show_from_date(connection: &MysqlConnection, date: String, type_of_date: 
         Date::DateOfForecast => results = temperatures
             .filter(date_of_forecast.eq(date))
             .load::<Temperature>(connection)
-            .expect("Error loading temperatures from saved date"),
+            .expect("Error loading temperatures from forecast's date"),
     }
-
 
     for result in results {
         println!("{:?}", result);
     }
+}
 
+fn no_data_for_date(connection: &MysqlConnection, date: String) -> bool{
+
+    let results: Vec<Temperature> = temperatures
+        .filter(date_saved.eq(date))
+        .load::<Temperature>(connection)
+        .expect("Error loading temperatures from saved date");
+
+    if results.is_empty() {
+        return true
+    }
+
+    false
 }
