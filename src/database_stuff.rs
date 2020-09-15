@@ -70,3 +70,47 @@ fn no_data_for_date(connection: &MysqlConnection, date: String) -> bool{
 
     false
 }
+
+// Insert dummy data to check the output
+// In case the user doesn't want to wait for a week to get the actual data
+//
+// Every part of the dummy data has an invalid date_of_forecast
+// Thus they shall not be confused with the real data
+pub fn add_dummy_data(connection: &MysqlConnection) {
+
+    let dummy_data: Vec<NewTemperature> = vec![
+        NewTemperature {
+            minimum: 0.0,
+            maximum: 0.0,
+            date_of_forecast: String::from("DUMMY"),
+            date_saved: String::from("1980-1-1")
+        },
+        NewTemperature {
+            minimum: 0.0,
+            maximum: 0.0,
+            date_of_forecast: String::from("DUMMY"),
+            date_saved: String::from("1980-1-2")
+        },
+        NewTemperature {
+            minimum: 0.0,
+            maximum: 0.0,
+            date_of_forecast: String::from("DUMMY"),
+            date_saved: String::from("1980-1-3")
+        },
+        NewTemperature {
+            minimum: 0.0,
+            maximum: 0.0,
+            date_of_forecast: String::from("DUMMY"),
+            date_saved: String::from("1980-1-4")
+        },
+        NewTemperature {
+            minimum: 0.0,
+            maximum: 0.0,
+            date_of_forecast: String::from("DUMMY"),
+            date_saved: String::from("1980-1-5")
+        }
+    ];
+
+    // Dummy data (as everything else) will not be inserted twice, if it already is in the database
+    insert_temperature(connection, dummy_data);
+}
