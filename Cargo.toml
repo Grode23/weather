@@ -17,3 +17,6 @@ serde = { version = "1.0.115", features = ["derive"] }
 # For database
 diesel = { version = "1.4.5", features = ["mysql"] }
 dotenv = "0.15.0"
+
+# Arguments
+structopt = "0.3.17"
