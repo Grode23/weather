@@ -6,11 +6,14 @@ mod json_structs;
 mod database_stuff;
 mod schema;
 mod models;
+mod calculations;
 
 use json_structs::Forecast;
-use database_stuff::*;
-use models::Date;
 use structopt::StructOpt;
+
+use database_stuff::*;
+use models::{Temperature, Date};
+use calculations::*;
 
 /// Arguments for program handling
 #[derive(StructOpt, Debug)]
@@ -54,9 +57,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
 	}
 
 
-
-	// let date = Date::DateSaved;
-	// show_from_date(&connection, String::from("2020-09-10"), date);
+	let date = Date::DateOfForecast;
+	get_from_date(&connection, String::from("DUMMY"), date);
 
 
 	Ok(())

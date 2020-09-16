@@ -37,24 +37,22 @@ pub fn insert_temperature(conn: &MysqlConnection, new_temperatures: Vec<NewTempe
     }
 }
 
-pub fn show_from_date(connection: &MysqlConnection, date: String, type_of_date: Date){
+pub fn get_from_date(connection: &MysqlConnection, date: String, type_of_date: Date) -> Vec<Temperature>{
 
-    let results: Vec<Temperature>;
+    let temperatures_vec: Vec<Temperature>;
 
     match type_of_date {
-        Date::DateSaved => results = temperatures
+        Date::DateSaved => temperatures_vec = temperatures
             .filter(date_saved.eq(date))
             .load::<Temperature>(connection)
             .expect("Error loading temperatures from saved date"),
-        Date::DateOfForecast => results = temperatures
+        Date::DateOfForecast => temperatures_vec = temperatures
             .filter(date_of_forecast.eq(date))
             .load::<Temperature>(connection)
             .expect("Error loading temperatures from forecast's date"),
     }
 
-    for result in results {
-        println!("{:?}", result);
-    }
+    temperatures_vec
 }
 
 fn no_data_for_date(connection: &MysqlConnection, date: String) -> bool{
