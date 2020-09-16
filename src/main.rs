@@ -12,7 +12,7 @@ use json_structs::Forecast;
 use structopt::StructOpt;
 
 use database_stuff::*;
-use models::{Temperature, Date};
+use models::Date;
 use calculations::*;
 
 /// Arguments for program handling
@@ -21,8 +21,12 @@ use calculations::*;
 struct Opt {
 
 	/// Add dummy data for testing
-	#[structopt(short, long = "add-dummy")]
+	#[structopt(long = "dummies")]
 	dummy: bool,
+
+	/// Add dummy data for testing
+	#[structopt(short, long)]
+	delete: bool,
 
 	/// Get data from the API
 	#[structopt(short = "a", long = "get-data-from-api")]
@@ -51,15 +55,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
 		insert_temperature(&connection, temperatures);
 	}
 
+	if opt.delete {
+		delete_all(&connection);
+	}
+
 	// Insert dummy data
 	if opt.dummy {
 		add_dummy_data(&connection);
 	}
 
-
 	let date = Date::DateOfForecast;
-	get_from_date(&connection, String::from("DUMMY"), date);
+	// I NEED ERROR HANDLING IN CASE OF ZERO SIZE (NO DATA)
+	let temperatures = get_from_date(&connection, String::from("DUMMY"), date);
 
-
+	let accuracy = get_accuracy_total(&temperatures);
+	println!("Accuracy of dummy is: {}", accuracy);
 	Ok(())
 }
