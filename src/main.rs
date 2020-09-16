@@ -29,7 +29,7 @@ struct Opt {
 	delete: bool,
 
 	/// Get data from the API
-	#[structopt(short = "a", long = "get-data-from-api")]
+	#[structopt(short = "a", long = "api")]
 	get_from_api: bool,
 
 }
@@ -68,7 +68,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
 	// I NEED ERROR HANDLING IN CASE OF ZERO SIZE (NO DATA)
 	let temperatures = get_from_date(&connection, String::from("DUMMY"), date);
 
-	let accuracy = get_accuracy_total(&temperatures);
+	let accuracy = get_accuracy_total(&temperatures, Rate::Normal);
 	println!("Accuracy of dummy is: {}", accuracy);
 	Ok(())
 }

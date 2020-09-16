@@ -24,6 +24,11 @@ pub fn get_accuracy_day(actual_temp: &Temperature, forecast_temp: &Temperature) 
     accurate_range as f32 / range as f32
 }
 
+pub enum Rate {
+    Normal,
+    Simple,
+}
+
 fn get_rates(total_forecasts: usize) -> Vec<f32> {
 
     let mut rates: Vec<f32> = Vec::new();
@@ -46,11 +51,27 @@ fn get_rates(total_forecasts: usize) -> Vec<f32> {
 
     rates
 }
+fn get_rates_simple(total_forecasts: usize) -> Vec<f32> {
 
-pub fn get_accuracy_total(temperatures: &Vec<Temperature>) -> f32{
+    let mut rates: Vec<f32> = Vec::new();
+    let standard_rate = 1.0 / total_forecasts as f32;
+
+    for _ in 0..total_forecasts {
+        rates.push(standard_rate);
+    }
+
+    rates
+}
+
+pub fn get_accuracy_total(temperatures: &Vec<Temperature>, rate: Rate) -> f32{
 
     let length = temperatures.len();
-    let rates = get_rates(length - 1);
+    let rates: Vec<f32>;
+
+    match rate {
+        Rate::Normal => rates = get_rates(length - 1),
+        Rate::Simple => rates = get_rates_simple(length - 1),
+    }
 
     let date_of_result = temperatures.get(length - 1).unwrap();
 
