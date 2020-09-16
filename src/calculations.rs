@@ -24,36 +24,30 @@ pub fn get_accuracy_day(actual_temp: Temperature, forecast_temp: Temperature) ->
     ( accurate_range as f32 / range as f32 )
 }
 
-pub fn get_accuracy_total(temperatures: &Vec<Temperature>) {
+pub fn get_accuracy_total(total_forecasts: i32) -> Vec<f32> {
 
     // The amount of temperatures
     // Minus one because the first date is the current date
-    let amount = temperatures.len() - 1 ;
 
     let mut rates: Vec<f32> = Vec::new();
 
-    let standard_rate = 1.0 / amount as f32;
+    let standard_rate = 1.0 / total_forecasts as f32;
 
     let mut denominator = 1.0;
-    for i in 0..amount / 2 {
-        denominator = denominator * 2.0;
-        rates.push(standard_rate + standard_rate/denominator);
+    for i in 0..total_forecasts {
+
+        if i < total_forecasts / 2 {
+            denominator = denominator * 2.0;
+            rates.push(standard_rate + standard_rate/denominator);
+        } else if i == total_forecasts / 2 && total_forecasts % 2 == 1 {
+            rates.push(standard_rate);
+        } else {
+            rates.push(standard_rate - standard_rate/denominator);
+            denominator = denominator / 2.0;
+        }
     }
 
-    let mut index = 0;
-    if  amount % 2 != 0 {
-        rates.push(standard_rate);
-        index = 1;
-    }
-
-    for i in (amount / 2) .. amount - index{
-        rates.push(standard_rate - standard_rate/denominator);
-        denominator = denominator / 2.0;
-    }
-
-    for rate in rates {
-        println!("{}", rate);
-    }
+    rates
 }
 
 
