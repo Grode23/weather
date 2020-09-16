@@ -1,7 +1,9 @@
 #![allow(non_snake_case)]
 use serde::Deserialize;
 use reqwest::Url;
-use crate::models::NewTemperature;
+use std::env;
+
+use super::models::NewTemperature;
 
 #[derive(Deserialize, Debug)]
 pub struct Forecast {
@@ -31,7 +33,9 @@ impl Forecast {
 
     pub async fn get() -> Result<Self, Box<dyn std::error::Error>>{
 
-        let url = format!("http://dataservice.accuweather.com/forecasts/v1/daily/5day/{}?metric=true&apikey={}", 186405, "fQZ3PdGlJiJDVVOfRmEGAFyjGcrUArtH");
+        let api_key = env::var("API_KEY").unwrap();
+
+        let url = format!("http://dataservice.accuweather.com/forecasts/v1/daily/5day/{}?metric=true&apikey={}", 186405, api_key);
         let url = Url::parse(&*url)?;
 
         let response = reqwest::get(url)
