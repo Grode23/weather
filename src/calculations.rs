@@ -2,7 +2,7 @@ use crate::models::Temperature;
 use std::cmp;
 
 // Get the rate of accuracy of a single date
-pub fn get_accuracy_day(actual_temp: Temperature, forecast_temp: Temperature) -> f32 {
+pub fn get_accuracy_day(actual_temp: &Temperature, forecast_temp: &Temperature) -> f32 {
 
     // Values need to be casted into integers, otherwise I cannot compare them
     let actual_min = (actual_temp.minimum + 100.0 ) as i32;
@@ -21,13 +21,10 @@ pub fn get_accuracy_day(actual_temp: Temperature, forecast_temp: Temperature) ->
     let accurate_range = max - min;
 
     // Rate of accuracy
-    ( accurate_range as f32 / range as f32 )
+    accurate_range as f32 / range as f32
 }
 
-pub fn get_accuracy_total(total_forecasts: i32) -> Vec<f32> {
-
-    // The amount of temperatures
-    // Minus one because the first date is the current date
+fn get_rates(total_forecasts: usize) -> Vec<f32> {
 
     let mut rates: Vec<f32> = Vec::new();
 
@@ -50,7 +47,22 @@ pub fn get_accuracy_total(total_forecasts: i32) -> Vec<f32> {
     rates
 }
 
+pub fn get_accuracy_total(temperatures: &Vec<Temperature>) -> f32{
 
+    let length = temperatures.len();
+    let rates = get_rates(length - 1);
+
+    let date_of_result = temperatures.get(length - 1).unwrap();
+
+    let mut final_result: f32 = 0.0;
+    for i in 0..length - 1 {
+
+        let accuracy = get_accuracy_day(date_of_result, temperatures.get(i).unwrap());
+        final_result += rates.get(i).unwrap() * accuracy;
+    }
+
+    final_result
+}
 
 
 
