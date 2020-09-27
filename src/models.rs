@@ -19,8 +19,3 @@ pub struct NewTemperature {
     pub date_of_forecast: String,
     pub date_saved: String,
 }
-
-pub enum Date {
-    DateOfForecast,
-    DateSaved,
-}
