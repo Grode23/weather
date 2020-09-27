@@ -33,7 +33,7 @@ impl Forecast {
 
     pub async fn get() -> Result<Self, Box<dyn std::error::Error>>{
 
-        let api_key = env::var("API_KEY").unwrap();
+        let api_key = env::var("ACCUWEATHER_KEY").unwrap();
 
         let url = format!("http://dataservice.accuweather.com/forecasts/v1/daily/5day/{}?metric=true&apikey={}", 186405, api_key);
         let url = Url::parse(&*url)?;

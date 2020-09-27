@@ -17,8 +17,6 @@ use crate::schema::temperatures::columns::{date_saved, date_of_forecast};
 // Import the table to insert
 use super::schema::temperatures;
 
-use crate::models::*;
-
 pub fn insert_temperature(conn: &MysqlConnection, new_temperatures: Vec<NewTemperature>) {
 
 
@@ -43,20 +41,14 @@ pub fn delete_all(connection: &MysqlConnection) {
         .expect("Error deleting posts");
 }
 
-pub fn get_from_date(connection: &MysqlConnection, date: String, type_of_date: Date) -> Vec<Temperature>{
+pub fn get_from_date(connection: &MysqlConnection, date: String) -> Vec<Temperature>{
 
     let temperatures_vec: Vec<Temperature>;
 
-    match type_of_date {
-        Date::DateSaved => temperatures_vec = temperatures::table
-            .filter(date_saved.eq(date))
-            .load::<Temperature>(connection)
-            .expect("Error loading temperatures from saved date"),
-        Date::DateOfForecast => temperatures_vec = temperatures::table
-            .filter(date_of_forecast.eq(date))
-            .load::<Temperature>(connection)
-            .expect("Error loading temperatures from forecast's date"),
-    }
+    temperatures_vec = temperatures::table
+        .filter(date_of_forecast.eq(date))
+        .load::<Temperature>(connection)
+        .expect("Error loading temperatures from forecast's date");
 
     temperatures_vec
 }

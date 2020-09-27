@@ -20,3 +20,6 @@ dotenv = "0.15.0"
 
 # Arguments
 structopt = "0.3.17"
+
+# For current date
+chrono = "0.4"
