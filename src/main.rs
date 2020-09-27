@@ -2,12 +2,12 @@
 extern crate diesel;
 extern crate dotenv;
 
-mod accuweather;
+mod accuweather_json;
 mod database_stuff;
 mod schema;
 mod models;
 mod calculations;
-mod weatherbit;
+mod weatherbit_json;
 
 // Uses of external libraries
 use structopt::StructOpt;
@@ -17,8 +17,8 @@ use chrono::{Utc, DateTime};
 use database_stuff::*;
 use calculations::*;
 use models::NewTemperature;
-use accuweather::Forecast as Accuweather;
-use weatherbit::Forecast as WeatherBit;
+use accuweather_json::Forecast as Accuweather;
+use weatherbit_json::Forecast as WeatherBit;
 
 /// Arguments for program handling
 #[derive(StructOpt, Debug)]
