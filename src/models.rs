@@ -5,6 +5,7 @@ pub struct Temperature {
     pub maximum: f32,
     pub date_of_forecast: String,
     pub date_saved: String,
+    pub api: String,
 }
 
 // Use it to be able to get the name of the table
@@ -18,4 +19,5 @@ pub struct NewTemperature {
     pub maximum: f32,
     pub date_of_forecast: String,
     pub date_saved: String,
+    pub api: String,
 }

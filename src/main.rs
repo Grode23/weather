@@ -37,9 +37,9 @@ struct Opt {
 	#[structopt(short, long)]
 	insert: bool,
 
-	/// Choose a specific API
+	/// Choose a specific API and get today's data from it
 	#[structopt(long = "api", default_value = "accuweather")]
-	get_from_api: String,
+	api_get: String,
 
 	/// Get accuracy
 	#[structopt(short, long)]
@@ -62,7 +62,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
 	let temperatures: Vec<NewTemperature>;
 
 	// Get data from the API
-	match opt.get_from_api.as_str() {
+	match opt.api_get.as_str() {
 		"accuweather" => {
 			// Get data from JSON
 			let answer = Accuweather::get().await?;
@@ -75,7 +75,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
 			// The prediction for the upcoming 5 days
 			temperatures = answer.get_temperatures();
 		},
-		_ => panic!("This API is not valid"),
+		_ => {
+			panic!("This API is not valid")
+		},
 	}
 
 	// Delete everything and then exit

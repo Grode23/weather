@@ -5,5 +5,6 @@ table! {
         maximum -> Float,
         date_of_forecast -> Varchar,
         date_saved -> Varchar,
+        api -> Varchar,
     }
 }

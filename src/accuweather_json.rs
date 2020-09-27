@@ -59,6 +59,7 @@ impl Forecast {
                 maximum: daily_forecast.Temperature.Maximum.Value,
                 date_of_forecast: String::from(&daily_forecast.Date[0..10]),
                 date_saved: current_date.clone(),
+                api: String::from("accuweather"),
             };
 
             temperatures.push(temperature);

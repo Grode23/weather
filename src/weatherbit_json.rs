@@ -46,6 +46,8 @@ impl Forecast {
                 maximum: forecast.max_temp,
                 date_of_forecast: String::from(&forecast.valid_date),
                 date_saved: current_date.clone(),
+                api: String::from("weatherbit"),
+
             };
 
             temperatures.push(temperature);

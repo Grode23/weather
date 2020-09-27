@@ -4,5 +4,6 @@ CREATE TABLE temperatures (
   minimum FLOAT NOT NULL,
   maximum FLOAT NOT NULL,
   date_of_forecast VARCHAR(20) NOT NULL,
-  date_saved VARCHAR(20) NOT NULL
+  date_saved VARCHAR(20) NOT NULL,
+  api VARCHAR(20) NOT NULL
 )

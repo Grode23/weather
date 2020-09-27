@@ -13,12 +13,13 @@ pub fn establish_connection() -> MysqlConnection {
 
 use super::models::{Temperature, NewTemperature};
 // Import columns, so I can select them when I get the data
-use crate::schema::temperatures::columns::{date_saved, date_of_forecast};
+use crate::schema::temperatures::columns::{date_saved, date_of_forecast, api};
 // Import the table to insert
 use super::schema::temperatures;
+use diesel::select;
+use diesel::dsl::exists;
 
-pub fn insert_temperature(conn: &MysqlConnection, new_temperatures: Vec<NewTemperature>) {
-
+pub fn insert_temperature(conn: &MysqlConnection, mut new_temperatures: Vec<NewTemperature>) {
 
     // Get date from an index that is going to be inserted
     // Every index has the same date_saved, so it doesn't matter which one I get
@@ -67,6 +68,14 @@ fn no_data_for_date(connection: &MysqlConnection, date: String) -> bool{
     false
 }
 
+pub fn existence_of_api(connection: &MysqlConnection, given_api: &str) -> bool {
+    let exists = select(exists(temperatures::table.filter(api.eq(given_api))))
+        .get_result(connection);
+
+    exists.unwrap()
+
+}
+
 // Insert dummy data to check the output
 // In case the user doesn't want to wait for a week to get the actual data
 //
@@ -79,31 +88,36 @@ pub fn add_dummy_data(connection: &MysqlConnection) {
             minimum: 25.3,
             maximum: 31.4,
             date_of_forecast: String::from("DUMMY"),
-            date_saved: String::from("1980-1-1")
+            date_saved: String::from("1980-1-1"),
+            api: String::from("DUMMY")
         },
         NewTemperature {
             minimum: 24.3,
             maximum: 30.4,
             date_of_forecast: String::from("DUMMY"),
-            date_saved: String::from("1980-1-2")
+            date_saved: String::from("1980-1-2"),
+            api: String::from("DUMMY")
         },
         NewTemperature {
             minimum: 25.7,
             maximum: 32.0,
             date_of_forecast: String::from("DUMMY"),
-            date_saved: String::from("1980-1-3")
+            date_saved: String::from("1980-1-3"),
+            api: String::from("DUMMY")
         },
         NewTemperature {
             minimum: 24.6,
             maximum: 31.9,
             date_of_forecast: String::from("DUMMY"),
-            date_saved: String::from("1980-1-4")
+            date_saved: String::from("1980-1-4"),
+            api: String::from("DUMMY")
         },
         NewTemperature {
             minimum: 25.0,
             maximum: 31.7,
             date_of_forecast: String::from("DUMMY"),
-            date_saved: String::from("1980-1-5")
+            date_saved: String::from("1980-1-5"),
+            api: String::from("DUMMY")
         }
     ];
 
