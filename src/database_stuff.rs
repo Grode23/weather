@@ -19,7 +19,7 @@ use super::schema::temperatures;
 use diesel::select;
 use diesel::dsl::exists;
 
-pub fn insert_temperature(conn: &MysqlConnection, mut new_temperatures: Vec<NewTemperature>) {
+pub fn insert_temperature(conn: &MysqlConnection, new_temperatures: &Vec<NewTemperature>) {
 
     // Get date from an index that is going to be inserted
     // Every index has the same date_saved, so it doesn't matter which one I get
@@ -28,7 +28,7 @@ pub fn insert_temperature(conn: &MysqlConnection, mut new_temperatures: Vec<NewT
     // check if the current date is inserted again. if it is, print it without inserting again
     if no_data_for_date(conn, date) {
         diesel::insert_into(temperatures::table)
-            .values(&new_temperatures)
+            .values(new_temperatures)
             .execute(conn)
             .expect("Error saving new post");
     } else {
@@ -42,7 +42,7 @@ pub fn delete_all(connection: &MysqlConnection) {
         .expect("Error deleting posts");
 }
 
-pub fn get_from_date(connection: &MysqlConnection, date: String) -> Vec<Temperature>{
+pub fn get_from_date(connection: &MysqlConnection, date: &String) -> Vec<Temperature>{
 
     let temperatures_vec: Vec<Temperature>;
 
@@ -122,5 +122,5 @@ pub fn add_dummy_data(connection: &MysqlConnection) {
     ];
 
     // Dummy data (as everything else) will not be inserted twice, if it already is in the database
-    insert_temperature(connection, dummy_data);
+    insert_temperature(connection, &dummy_data);
 }

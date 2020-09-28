@@ -1,5 +1,6 @@
 use crate::models::Temperature;
 use std::cmp;
+use serde::export::Formatter;
 
 // Get the rate of accuracy of a single date
 pub fn get_accuracy_day(actual_temp: &Temperature, forecast_temp: &Temperature) -> f32 {
@@ -24,10 +25,18 @@ pub fn get_accuracy_day(actual_temp: &Temperature, forecast_temp: &Temperature) 
     accurate_range as f32 / range as f32
 }
 
+#[derive(Debug)]
 pub enum Rate {
     Normal,
     Simple,
 }
+
+impl std::fmt::Display for Rate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 
 fn get_rates(total_forecasts: usize) -> Vec<f32> {
 
