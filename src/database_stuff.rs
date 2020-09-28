@@ -13,11 +13,9 @@ pub fn establish_connection() -> MysqlConnection {
 
 use super::models::{Temperature, NewTemperature};
 // Import columns, so I can select them when I get the data
-use crate::schema::temperatures::columns::{date_saved, date_of_forecast, api};
+use crate::schema::temperatures::columns::{date_saved, date_of_forecast};
 // Import the table to insert
 use super::schema::temperatures;
-use diesel::select;
-use diesel::dsl::exists;
 
 pub fn insert_temperature(conn: &MysqlConnection, new_temperatures: &Vec<NewTemperature>) {
 
@@ -66,14 +64,6 @@ fn no_data_for_date(connection: &MysqlConnection, date: String) -> bool{
     }
 
     false
-}
-
-pub fn existence_of_api(connection: &MysqlConnection, given_api: &str) -> bool {
-    let exists = select(exists(temperatures::table.filter(api.eq(given_api))))
-        .get_result(connection);
-
-    exists.unwrap()
-
 }
 
 // Insert dummy data to check the output
