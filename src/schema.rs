@@ -2,6 +2,7 @@ table! {
     accuracies (id) {
         id -> Integer,
         accuracy -> Float,
+        date_of_forecast -> Varchar,
         api -> Varchar,
     }
 }
