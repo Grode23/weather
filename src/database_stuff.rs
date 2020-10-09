@@ -11,20 +11,53 @@ pub fn establish_connection() -> MysqlConnection {
         .expect(&format!("Error connecting to {}", database_url))
 }
 
-use super::models::{Temperature, NewTemperature};
+use super::models::*;
 // Import columns, so I can select them when I get the data
-use crate::schema::temperatures::columns::{date_saved, date_of_forecast};
+use crate::schema::temperatures::columns::{date_saved, date_of_forecast as date_of_forecast_temp};
+use crate::schema::accuracies::columns::{accuracy, date_of_forecast as date_of_forecast_acc};
 // Import the table to insert
-use super::schema::temperatures;
+use super::schema::{temperatures, accuracies};
+
+pub fn insert_accuracy(conn: &MysqlConnection, new_accuracy: NewAccuracy) {
+
+    let date = String::from(&new_accuracy.date_of_forecast);
+
+    // νεα συναρτηση αντι για nodatafordate, που θα επιστρεφει ενα option. αν ειναι none, κανω insert
+    // αν ειναι Ok, κραταει το id που χρειαζομαι και με αυτο θα κανω update
+
+    if let Some(id) = no_data_for_date(conn, date, Tables::Accuracy) {
+        // Update
+        diesel::update(accuracies::table.find(id))
+            .set(accuracy.eq(accuracy))
+            .execute(conn)
+            .expect(&format!("Unable to find post with id: {}", id));
+    } else {
+        // Insert
+        diesel::insert_into(accuracies::table)
+            .values(new_accuracy)
+            .execute(conn)
+            .expect("Error saving new post");
+    }
+
+}
+
 
 pub fn insert_temperature(conn: &MysqlConnection, new_temperatures: &Vec<NewTemperature>) {
 
-    // Get date from an index that is going to be inserted
-    // Every index has the same date_saved, so it doesn't matter which one I get
-    let date = String::from(&new_temperatures.get(0).unwrap().date_saved);
+    let date: String;
+
+    if !new_temperatures.is_empty() {
+        // Get date from an index that is going to be inserted
+        // Every index has the same date_saved, so it doesn't matter which one I get
+        date = String::from(&new_temperatures.get(0).unwrap().date_saved);
+    } else {
+        println!("There are no data to insert into the database");
+        return
+    }
+
 
     // check if the current date is inserted again. if it is, print it without inserting again
-    if no_data_for_date(conn, date) {
+    if let None = no_data_for_date(conn, date, Tables::Temperature) {
         diesel::insert_into(temperatures::table)
             .values(new_temperatures)
             .execute(conn)
@@ -45,25 +78,44 @@ pub fn get_from_date(connection: &MysqlConnection, date: &String) -> Vec<Tempera
     let temperatures_vec: Vec<Temperature>;
 
     temperatures_vec = temperatures::table
-        .filter(date_of_forecast.eq(date))
+        .filter(date_of_forecast_temp.eq(date))
         .load::<Temperature>(connection)
         .expect("Error loading temperatures from forecast's date");
 
     temperatures_vec
 }
 
-fn no_data_for_date(connection: &MysqlConnection, date: String) -> bool{
+fn no_data_for_date(connection: &MysqlConnection, date: String, table_name: Tables) -> Option<i32> {
 
-    let results: Vec<Temperature> = temperatures::table
-        .filter(date_saved.eq(date))
-        .load::<Temperature>(connection)
-        .expect("Error loading temperatures from saved date");
+    match table_name {
+        Tables::Temperature => {
+            let results: Vec<Temperature> = temperatures::table
+                .filter(date_saved.eq(date))
+                .load::<Temperature>(connection)
+                .expect("Error loading temperatures from saved date");
 
-    if results.is_empty() {
-        return true
+            if results.is_empty() {
+                return None
+            }
+
+            return Some(results[0].id)
+        },
+        Tables::Accuracy => {
+            let results: Vec<Accuracy>= accuracies::table
+                .filter(date_of_forecast_acc.eq(date))
+                .load::<Accuracy>(connection)
+                .expect("Error loading accuracies from date");
+
+            if results.is_empty() {
+                return None
+            }
+
+            return Some(results[0].id)
+        },
+        _ => {}
     }
 
-    false
+    None
 }
 
 // Insert dummy data to check the output

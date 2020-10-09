@@ -19,6 +19,7 @@ use models::NewTemperature;
 use accuweather_json::Forecast as Accuweather;
 use weatherbit_json::Forecast as WeatherBit;
 use std::io;
+use crate::models::NewAccuracy;
 
 fn read() -> String{
 
@@ -190,6 +191,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
 						let accuracy = get_accuracy_total(&temperatures, Rate::Normal);
 
 						println!("Accuracy of {} is {}", date, accuracy);
+
+						let new_accuracy = NewAccuracy {
+							accuracy,
+							date_of_forecast: String::from(&date),
+							api: String::from(&api),
+						};
+
+						insert_accuracy(&connection, new_accuracy);
 					}
 					_ => println!("Incorrect answer to Calculation menu"),
 				}

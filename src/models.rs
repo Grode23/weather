@@ -1,3 +1,13 @@
+// Use it to be able to get the name of the table
+// Chicka-chicka rhymes
+use super::schema::{temperatures, accuracies};
+
+pub enum Tables {
+    Temperature,
+    Accuracy,
+    Total,
+}
+
 #[derive(Queryable, Debug)]
 pub struct Temperature {
     pub id: i32,
@@ -8,10 +18,6 @@ pub struct Temperature {
     pub api: String,
 }
 
-// Use it to be able to get the name of the table
-// Chicka-chicka rhymes
-use super::schema::temperatures;
-
 #[derive(Insertable, Debug)]
 #[table_name="temperatures"]
 pub struct NewTemperature {
@@ -19,5 +25,21 @@ pub struct NewTemperature {
     pub maximum: f32,
     pub date_of_forecast: String,
     pub date_saved: String,
+    pub api: String,
+}
+
+#[derive(Queryable, Debug)]
+pub struct Accuracy {
+    pub id: i32,
+    pub accuracy: f32,
+    pub date_of_forecast: String,
+    pub api: String,
+}
+
+#[derive(Insertable, Debug)]
+#[table_name="accuracies"]
+pub struct NewAccuracy {
+    pub accuracy: f32,
+    pub date_of_forecast: String,
     pub api: String,
 }
