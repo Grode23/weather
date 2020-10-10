@@ -15,17 +15,14 @@ use super::models::*;
 // Import columns, so I can select them when I get the data
 use crate::schema::temperatures::columns::{date_saved, date_of_forecast as date_of_forecast_temp, api as api_temp};
 use crate::schema::accuracies::columns::{accuracy, date_of_forecast as date_of_forecast_acc, api as api_acc};
+use crate::schema::total::columns::accum_accuracy;
 // Import the table to insert
-use super::schema::{temperatures, accuracies};
+use super::schema::{temperatures, accuracies, total};
 
 pub fn insert_accuracy(conn: &MysqlConnection, new_accuracy: NewAccuracy) {
 
     let date = String::from(&new_accuracy.date_of_forecast);
     let api = String::from(&new_accuracy.api);
-
-    // νεα συναρτηση αντι για nodatafordate, που θα επιστρεφει ενα option. αν ειναι none, κανω insert
-    // αν ειναι Ok, κραταει το id που χρειαζομαι και με αυτο θα κανω update
-
 
     if let Some(id) = no_data_for_date(conn, date, api,Tables::Accuracy) {
 
@@ -126,6 +123,44 @@ fn no_data_for_date(connection: &MysqlConnection, check_date: String, check_api:
     }
 
     None
+}
+
+pub fn update_total_accuracy(connection: &MysqlConnection, check_api: &String) {
+
+    // Get all data from the current api
+    let results: Vec<Accuracy> = accuracies::table
+        .filter(api_acc.eq(check_api))
+        .load::<Accuracy>(connection)
+        .expect("Error loading accuracies from date");
+
+    // If these is only one item, the value needs to be inserted
+    // Otherwise, it needs to be updated
+    if results.len() == 1 {
+
+        let total = Total {
+            api: String::from(check_api),
+            accum_accuracy: results.get(0).unwrap().accuracy,
+        };
+
+        // Insert
+        diesel::insert_into(total::table)
+            .values(total)
+            .execute(connection)
+            .expect("Error saving new post");
+
+    } else {
+
+        let total_accuracy = results.iter().fold(0.0, |acc, x| acc + x.accuracy);
+        let total_accuracy = total_accuracy / results.len() as f32;
+
+        // Update
+        diesel::update(total::table.find(check_api))
+            .set(accum_accuracy.eq(total_accuracy))
+            .execute(connection)
+            .expect(&format!("Unable to find post from api: {}", check_api));
+
+    }
+
 }
 
 // Insert dummy data to check the output

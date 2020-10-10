@@ -1,6 +1,6 @@
 // Use it to be able to get the name of the table
 // Chicka-chicka rhymes
-use super::schema::{temperatures, accuracies};
+use super::schema::{temperatures, accuracies, total};
 
 pub enum Tables {
     Temperature,
@@ -42,4 +42,11 @@ pub struct NewAccuracy {
     pub accuracy: f32,
     pub date_of_forecast: String,
     pub api: String,
+}
+
+#[derive(Queryable, Insertable, Debug)]
+#[table_name="total"]
+pub struct Total {
+    pub api: String,
+    pub accum_accuracy: f32,
 }

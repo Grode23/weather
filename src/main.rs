@@ -199,6 +199,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
 						};
 
 						insert_accuracy(&connection, new_accuracy);
+						update_total_accuracy(&connection, &api);
+
 					},
 					_ => println!("Incorrect answer to Calculation menu"),
 				}
