@@ -85,7 +85,8 @@ pub fn get_from_date(connection: &MysqlConnection, check_date: &String, check_ap
     let temperatures_vec: Vec<Temperature>;
 
     temperatures_vec = temperatures::table
-        .filter(date_of_forecast_temp.eq(check_date).and(api_temp.eq(check_api)))
+        .filter(date_of_forecast_temp.eq(check_date)
+            .and(api_temp.eq(check_api)))
         .load::<Temperature>(connection)
         .expect("Error loading temperatures from forecast's date");
 
@@ -97,7 +98,8 @@ fn no_data_for_date(connection: &MysqlConnection, check_date: String, check_api:
     match table_name {
         Tables::Temperature => {
             let results: Vec<Temperature> = temperatures::table
-                .filter(date_saved.eq(check_date).and(api_temp.eq(check_api)))
+                .filter(date_saved.eq(check_date)
+                    .and(api_temp.eq(check_api)))
                 .load::<Temperature>(connection)
                 .expect("Error loading temperatures from saved date");
 
@@ -109,7 +111,8 @@ fn no_data_for_date(connection: &MysqlConnection, check_date: String, check_api:
         },
         Tables::Accuracy => {
             let results: Vec<Accuracy>= accuracies::table
-                .filter(date_of_forecast_acc.eq(check_date).and(api_acc.eq(check_api)))
+                .filter(date_of_forecast_acc.eq(check_date)
+                    .and(api_acc.eq(check_api)))
                 .load::<Accuracy>(connection)
                 .expect("Error loading accuracies from date");
 
@@ -150,7 +153,9 @@ pub fn update_total_accuracy(connection: &MysqlConnection, check_api: &String) {
 
     } else {
 
-        let total_accuracy = results.iter().fold(0.0, |acc, x| acc + x.accuracy);
+        let total_accuracy = results
+            .iter()
+            .fold(0.0, |acc, x| acc + x.accuracy);
         let total_accuracy = total_accuracy / results.len() as f32;
 
         // Update
