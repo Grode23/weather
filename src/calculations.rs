@@ -93,13 +93,3 @@ pub fn get_accuracy_total(temperatures: &Vec<Temperature>, rate: Rate) -> f32{
 
     final_result
 }
-
-
-
-
-
-
-
-
-
-

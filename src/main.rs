@@ -187,7 +187,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
 					"2" => date = choose_date(&date),
 					// Calculate accuracy
 					"3" => {
-						let temperatures = get_from_date(&connection, &date);
+						let temperatures = get_from_date(&connection, &date, &api);
 						let accuracy = get_accuracy_total(&temperatures, Rate::Normal);
 
 						println!("Accuracy of {} is {}", date, accuracy);
@@ -199,7 +199,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
 						};
 
 						insert_accuracy(&connection, new_accuracy);
-					}
+					},
 					_ => println!("Incorrect answer to Calculation menu"),
 				}
 			},

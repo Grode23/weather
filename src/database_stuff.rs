@@ -13,51 +13,61 @@ pub fn establish_connection() -> MysqlConnection {
 
 use super::models::*;
 // Import columns, so I can select them when I get the data
-use crate::schema::temperatures::columns::{date_saved, date_of_forecast as date_of_forecast_temp};
-use crate::schema::accuracies::columns::{accuracy, date_of_forecast as date_of_forecast_acc};
+use crate::schema::temperatures::columns::{date_saved, date_of_forecast as date_of_forecast_temp, api as api_temp};
+use crate::schema::accuracies::columns::{accuracy, date_of_forecast as date_of_forecast_acc, api as api_acc};
 // Import the table to insert
 use super::schema::{temperatures, accuracies};
 
 pub fn insert_accuracy(conn: &MysqlConnection, new_accuracy: NewAccuracy) {
 
     let date = String::from(&new_accuracy.date_of_forecast);
+    let api = String::from(&new_accuracy.api);
 
     // νεα συναρτηση αντι για nodatafordate, που θα επιστρεφει ενα option. αν ειναι none, κανω insert
     // αν ειναι Ok, κραταει το id που χρειαζομαι και με αυτο θα κανω update
 
-    if let Some(id) = no_data_for_date(conn, date, Tables::Accuracy) {
+
+    if let Some(id) = no_data_for_date(conn, date, api,Tables::Accuracy) {
+
+        // Get the accuracy value for the update
+        let check_accuracy = new_accuracy.accuracy;
+
         // Update
         diesel::update(accuracies::table.find(id))
-            .set(accuracy.eq(accuracy))
+            .set(accuracy.eq(check_accuracy))
             .execute(conn)
             .expect(&format!("Unable to find post with id: {}", id));
+
+        println!("Accuracy has been updated");
     } else {
         // Insert
         diesel::insert_into(accuracies::table)
             .values(new_accuracy)
             .execute(conn)
             .expect("Error saving new post");
+
+        println!("Accuracy has been inserted");
     }
 
 }
 
-
 pub fn insert_temperature(conn: &MysqlConnection, new_temperatures: &Vec<NewTemperature>) {
 
     let date: String;
+    let api: String;
 
     if !new_temperatures.is_empty() {
         // Get date from an index that is going to be inserted
         // Every index has the same date_saved, so it doesn't matter which one I get
         date = String::from(&new_temperatures.get(0).unwrap().date_saved);
+        api = String::from(&new_temperatures.get(0).unwrap().api);
     } else {
         println!("There are no data to insert into the database");
         return
     }
 
-
     // check if the current date is inserted again. if it is, print it without inserting again
-    if let None = no_data_for_date(conn, date, Tables::Temperature) {
+    if let None = no_data_for_date(conn, date, api, Tables::Temperature) {
         diesel::insert_into(temperatures::table)
             .values(new_temperatures)
             .execute(conn)
@@ -73,24 +83,24 @@ pub fn delete_all(connection: &MysqlConnection) {
         .expect("Error deleting posts");
 }
 
-pub fn get_from_date(connection: &MysqlConnection, date: &String) -> Vec<Temperature>{
+pub fn get_from_date(connection: &MysqlConnection, check_date: &String, check_api: &String) -> Vec<Temperature>{
 
     let temperatures_vec: Vec<Temperature>;
 
     temperatures_vec = temperatures::table
-        .filter(date_of_forecast_temp.eq(date))
+        .filter(date_of_forecast_temp.eq(check_date).and(api_temp.eq(check_api)))
         .load::<Temperature>(connection)
         .expect("Error loading temperatures from forecast's date");
 
     temperatures_vec
 }
 
-fn no_data_for_date(connection: &MysqlConnection, date: String, table_name: Tables) -> Option<i32> {
+fn no_data_for_date(connection: &MysqlConnection, check_date: String, check_api: String, table_name: Tables) -> Option<i32> {
 
     match table_name {
         Tables::Temperature => {
             let results: Vec<Temperature> = temperatures::table
-                .filter(date_saved.eq(date))
+                .filter(date_saved.eq(check_date).and(api_temp.eq(check_api)))
                 .load::<Temperature>(connection)
                 .expect("Error loading temperatures from saved date");
 
@@ -102,7 +112,7 @@ fn no_data_for_date(connection: &MysqlConnection, date: String, table_name: Tabl
         },
         Tables::Accuracy => {
             let results: Vec<Accuracy>= accuracies::table
-                .filter(date_of_forecast_acc.eq(date))
+                .filter(date_of_forecast_acc.eq(check_date).and(api_acc.eq(check_api)))
                 .load::<Accuracy>(connection)
                 .expect("Error loading accuracies from date");
 
