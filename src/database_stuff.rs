@@ -33,7 +33,7 @@ pub fn insert_accuracy(conn: &MysqlConnection, new_accuracy: NewAccuracy) {
         diesel::update(accuracies::table.find(id))
             .set(accuracy.eq(check_accuracy))
             .execute(conn)
-            .expect(&format!("Unable to find post with id: {}", id));
+            .expect(&format!("Unable to find accuracy with id: {}", id));
 
         println!("Accuracy has been updated");
     } else {
@@ -41,7 +41,7 @@ pub fn insert_accuracy(conn: &MysqlConnection, new_accuracy: NewAccuracy) {
         diesel::insert_into(accuracies::table)
             .values(new_accuracy)
             .execute(conn)
-            .expect("Error saving new post");
+            .expect("Error inserting new accuracy");
 
         println!("Accuracy has been inserted");
     }
@@ -68,7 +68,7 @@ pub fn insert_temperature(conn: &MysqlConnection, new_temperatures: &Vec<NewTemp
         diesel::insert_into(temperatures::table)
             .values(new_temperatures)
             .execute(conn)
-            .expect("Error saving new post");
+            .expect("Error inserting new post");
     } else {
         println!("This date is already inserted");
     }
@@ -77,7 +77,7 @@ pub fn insert_temperature(conn: &MysqlConnection, new_temperatures: &Vec<NewTemp
 pub fn delete_all(connection: &MysqlConnection) {
     diesel::delete(temperatures::table)
         .execute(connection)
-        .expect("Error deleting posts");
+        .expect("Error while deleting posts");
 }
 
 pub fn get_from_date(connection: &MysqlConnection, check_date: &String, check_api: &String) -> Vec<Temperature>{
@@ -88,7 +88,7 @@ pub fn get_from_date(connection: &MysqlConnection, check_date: &String, check_ap
         .filter(date_of_forecast_temp.eq(check_date)
             .and(api_temp.eq(check_api)))
         .load::<Temperature>(connection)
-        .expect("Error loading temperatures from forecast's date");
+        .expect("Error loading temperatures from date of forecast");
 
     temperatures_vec
 }
@@ -114,7 +114,7 @@ fn no_data_for_date(connection: &MysqlConnection, check_date: String, check_api:
                 .filter(date_of_forecast_acc.eq(check_date)
                     .and(api_acc.eq(check_api)))
                 .load::<Accuracy>(connection)
-                .expect("Error loading accuracies from date");
+                .expect("Error loading accuracies from date of forecast");
 
             if results.is_empty() {
                 return None
@@ -134,7 +134,7 @@ pub fn update_total_accuracy(connection: &MysqlConnection, check_api: &String) {
     let results: Vec<Accuracy> = accuracies::table
         .filter(api_acc.eq(check_api))
         .load::<Accuracy>(connection)
-        .expect("Error loading accuracies from date");
+        .expect("Error loading accuracies from api");
 
     // If these is only one item, the value needs to be inserted
     // Otherwise, it needs to be updated
@@ -149,7 +149,7 @@ pub fn update_total_accuracy(connection: &MysqlConnection, check_api: &String) {
         diesel::insert_into(total::table)
             .values(total)
             .execute(connection)
-            .expect("Error saving new post");
+            .expect("Error inserting into total");
 
     } else {
 
@@ -162,7 +162,7 @@ pub fn update_total_accuracy(connection: &MysqlConnection, check_api: &String) {
         diesel::update(total::table.find(check_api))
             .set(accum_accuracy.eq(total_accuracy))
             .execute(connection)
-            .expect(&format!("Unable to find post from api: {}", check_api));
+            .expect(&format!("Unable to find total with api: {}", check_api));
 
     }
 
