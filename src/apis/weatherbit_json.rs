@@ -2,7 +2,7 @@ use serde::Deserialize;
 use reqwest::Url;
 use std::env;
 
-use super::models::NewTemperature;
+use crate::models::NewTemperature;
 
 #[derive(Deserialize, Debug)]
 pub struct Forecast {
