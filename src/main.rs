@@ -22,13 +22,19 @@ use crate::models::NewAccuracy;
 
 fn read() -> String{
 
+	print!("Your answer: ");
+	// No new line is display, so I have to flush
+	// Otherwise, the above line won't be displayed to the user
+	io::Write::flush(&mut io::stdout()).expect("flush failed!");
+
 	let mut answer = String::new();
 	io::stdin()
 		.read_line(&mut answer)
 		.expect("Failed to read line");
 
-	let length = answer.len();
+	println!();
 
+	let length = answer.len();
 	answer[0..length-1].to_string()
 }
 
