@@ -121,11 +121,8 @@ fn no_data_for_date(connection: &MysqlConnection, check_date: String, check_api:
             }
 
             return Some(results[0].id)
-        },
-        _ => {}
+        }
     }
-
-    None
 }
 
 pub fn update_total_accuracy(connection: &MysqlConnection, check_api: &String) {
