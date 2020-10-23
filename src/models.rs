@@ -5,6 +5,7 @@ use super::schema::{temperatures, accuracies, total};
 pub enum Tables {
     Temperature,
     Accuracy,
+    Total,
 }
 
 #[derive(Queryable, Debug)]
