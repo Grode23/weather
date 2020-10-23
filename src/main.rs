@@ -2,22 +2,23 @@
 extern crate diesel;
 extern crate dotenv;
 
-// Uses of external libraries
-use chrono::{Utc, DateTime};
-use std::io;
-
 mod apis;
 mod database_stuff;
 mod schema;
 mod models;
 mod calculations;
 
+// Uses of external libraries
+use chrono::{Utc, DateTime};
+
 // Uses of my own mods
 use database_stuff::*;
 use calculations::*;
-use models::{NewTemperature, NewAccuracy};
+use models::NewTemperature;
 use apis::accuweather_json::Forecast as Accuweather;
 use apis::weatherbit_json::Forecast as WeatherBit;
+use std::io;
+use crate::models::NewAccuracy;
 
 fn read() -> String{
 
@@ -217,4 +218,3 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
 
 	Ok(())
 }
-
